@@ -53,6 +53,21 @@ def maximise_center_score(centers, patients):
         if best_center:
             best_center['patients'].append(patient)
 
+# Distance Matrix
+# p1 - [c1, c2, c3]
+# p2 - [c1, c2, c3]
+
+
+def distance_matrix(centers, patients):
+    matrix = []
+    for patient in patients:
+        p = []
+        for center in centers:
+            p.append(distance(patient['centre'], center['centre']))
+        matrix.append(p)
+
+    return np.array(matrix)
+
 
 def main(path):
     img = cv2.imread(path)
@@ -67,8 +82,7 @@ def main(path):
             i['patients'] = []
             centre_list.append(i)
 
-    # for i in obj_list:
-    #     print(i['shape'], i['type'], i['color'], i['centre'])
+    print(distance_matrix(centre_list, patient_list))
 
 
 main(name)
