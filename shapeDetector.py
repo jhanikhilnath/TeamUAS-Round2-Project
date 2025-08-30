@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+import colorDetector as cd
+
 img = cv2.imread('./uas images/1.png')
 
 # Image Preprocessing
@@ -54,14 +56,19 @@ for i, contour in enumerate(contours):
     color = (0, 0, 0)
     font = cv2.FONT_HERSHEY_DUPLEX
 
+    # cv2.putText(img, cd.detect_color(img, contour), coords, font, 1, color, 1)
+
+    color_analysis = cd.detect_color(img, contour)
+
     if len(approx) == 3:
-        cv2.putText(img, "Triangle", coords, font, 1, color, 1)
+        cv2.putText(img, f"{color_analysis} Triangle",
+                    coords, font, 1, color, 1)
     elif len(approx) == 4:
-        cv2.putText(img, "square", coords, font, 1, color, 1)
+        cv2.putText(img, f"{color_analysis} square", coords, font, 1, color, 1)
     elif len(approx) == 10:
-        cv2.putText(img, "star", coords, font, 1, color, 1)
+        cv2.putText(img, f"{color_analysis} star", coords, font, 1, color, 1)
     else:
-        cv2.putText(img, "Circle", coords, font, 1, color, 1)
+        cv2.putText(img, f"{color_analysis} Circle", coords, font, 1, color, 1)
 
 # Final Number of shapes
 print(len(final_shape_list))
