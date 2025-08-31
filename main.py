@@ -34,8 +34,8 @@ def center_priority(center):
 
 
 def calculate_score(center, patient):
-    distance = distance(center['centre'], patient['centre'])
-    return calculate_priority(patient)/distance
+    point_distance = distance(center['centre'], patient['centre'])
+    return calculate_priority(patient)/point_distance
 
 
 def maximise_center_score(centers, patients):
@@ -66,7 +66,27 @@ def distance_matrix(centers, patients):
             p.append(distance(patient['centre'], center['centre']))
         matrix.append(p)
 
-    return np.array(matrix)
+    return np.array(matrix, dtype=np.float32)
+
+
+def center_casualty_list(centers):
+    blue_center = []
+    pink_center = []
+    grey_center = []
+    for center in centers:
+        x = []
+        for patient in center['patients']:
+            x.append(
+                [shape_list[patient['shape']], color_list[patient['color']]])
+
+        if center['color'] == 'pink':
+            pink_center = x
+        elif center['color'] == 'blue':
+            blue_center = x
+        else:
+            grey_center = x
+
+    return [blue_center, pink_center, grey_center]
 
 
 def main(path):
@@ -82,7 +102,9 @@ def main(path):
             i['patients'] = []
             centre_list.append(i)
 
+    maximise_center_score(centre_list, patient_list)
     print(distance_matrix(centre_list, patient_list))
+    print(center_casualty_list(centre_list))
 
 
 main(name)
