@@ -9,12 +9,12 @@ import math
 shape_list = {'star': 3, 'triangle': 2, 'square': 1}
 color_list = {'red': 3, 'yellow': 2, 'green': 1}
 center_color_list = {'pink': 3, 'blue': 4, 'grey': 2}
-# img_list = os.listdir('./uas images')
+img_list = os.listdir('./uas images')
 
-# for i in img_list:
-#   main(f'./uas images/{i}')
+for i in img_list:
+    print(int(i[:-4]))
 
-name = './uas images/1.png'
+name = './uas images/2.png'
 
 
 def distance(p1, p2):
@@ -22,6 +22,7 @@ def distance(p1, p2):
 
 
 def calculate_priority(patient):
+    print(patient['color'])
     return shape_list[patient['shape']]*color_list[patient['color']]
 
 
@@ -86,6 +87,7 @@ def center_patient_list_gen(centers):
         else:
             grey_center = x
 
+    # Return Order is [blue, pink, grey]
     return [blue_center, pink_center, grey_center]
 
 
@@ -102,7 +104,7 @@ def main(path):
     patient_list = []
     centre_list = []
     for i in obj_list:
-        i['color'] = cd.detect_color(img, i['contour'])
+        i['color'] = cd.detect_color(img, i['contour'], i['type'])
         if not i['type']:
             patient_list.append(i)
         else:
@@ -118,6 +120,7 @@ def main(path):
         center_score_list.append(center_score_calc(i))
 
     print(center_score_list)
+    cd.segment_ocean_land(img, 1)
 
     final_image_score = sum(center_score_list) / len(patient_list)
     print(final_image_score)
