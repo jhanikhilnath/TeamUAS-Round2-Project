@@ -1,10 +1,11 @@
 import cv2
 import numpy as np
-import colorDetector as cd
-import shapeDetector as sd
 import os
 import math
 
+import colorDetector as cd
+import shapeDetector as sd
+import idOutput as idOut
 
 shape_list = {'star': 3, 'triangle': 2, 'square': 1}
 color_list = {'red': 3, 'yellow': 2, 'green': 1}
@@ -36,7 +37,7 @@ def calculate_score(center, patient):
 def maximise_center_score(centers, patients):
     sorted_patients = sorted(patients, key=lambda x: (
         calculate_priority(x), color_list[x['color']]))
-    for patient in patients:
+    for patient in sorted_patients:
         best_center = None
         best_score = -math.inf
         for center in centers:
@@ -46,6 +47,7 @@ def maximise_center_score(centers, patients):
                     best_score = score
                     best_center = center
         if best_center:
+            patient['score'] = calculate_score(center, patient)
             best_center['patients'].append(patient)
 
 # Distance Matrix
@@ -54,14 +56,16 @@ def maximise_center_score(centers, patients):
 
 
 def distance_matrix(centers, patients):
-    matrix = []
+    matrix = [[0]]
+    for i in centers:
+        matrix[0].append(i['id'])
     for patient in patients:
-        p = []
+        p = [patient['id']]
         for center in centers:
-            p.append(distance(patient['centre'], center['centre']))
+            p.append(int(distance(patient['centre'], center['centre'])))
         matrix.append(p)
 
-    return np.array(matrix, dtype=np.float32)
+    return np.array(matrix)
 
 
 def center_patient_list_gen(centers):
@@ -87,8 +91,8 @@ def center_patient_list_gen(centers):
 
 def center_score_calc(center):
     center_sum = 0
-    for i in center:
-        center_sum += i[0]*i[1]
+    for j in center['patients']:
+        center_sum += j['score']
     return center_sum
 
 
@@ -100,17 +104,21 @@ def main(path, num):
     for i in obj_list:
         i['color'] = cd.detect_color(img, i['contour'], i['type'])
         if not i['type']:
+            i['id'] = f"P{len(patient_list)+1}"
             patient_list.append(i)
         else:
+            i['id'] = f"C{len(centre_list)+1}"
             i['patients'] = []
             centre_list.append(i)
+
+    idOut.id_draw(img.copy(), num, patient_list+centre_list)
 
     maximise_center_score(centre_list, patient_list)
     print(
         f"Image Number {num} Distance Matrix: \n {distance_matrix(centre_list, patient_list)}")
     center_patient_list = center_patient_list_gen(centre_list)
     center_score_list = []
-    for i in center_patient_list:
+    for i in centre_list:
         center_score_list.append(center_score_calc(i))
 
     print(f"Image Number {num} Centre Score List:{center_patient_list}")

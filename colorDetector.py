@@ -23,8 +23,8 @@ def segment_ocean_land(img, i):
 
     # Prepare the output path
     image_name = f"{i}_output.png"
-    os.makedirs('output_folder', exist_ok=True)
-    output_path = os.path.join('./output_folder', image_name)
+    os.makedirs('output_folder/segmented_colors', exist_ok=True)
+    output_path = os.path.join('./output_folder/segmented_colors', image_name)
 
     # Save the result (segmented) image
     cv2.imwrite(output_path, segmented)
