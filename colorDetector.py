@@ -10,7 +10,7 @@ def segment_ocean_land(img, i):
 
     # Segment ocean and land using color thresholds
     ocean_mask = cv2.inRange(hsv, (100, 50, 50), (140, 200, 200))
-    land_mask = cv2.inRange(hsv, (30, 30, 30), (80, 220, 200))
+    land_mask = cv2.inRange(hsv, (40, 40, 40), (70, 210, 170))
     kernel = np.ones((5, 5), np.uint8)
     ocean_mask = cv2.morphologyEx(ocean_mask, cv2.MORPH_CLOSE, kernel)
     land_mask = cv2.morphologyEx(land_mask, cv2.MORPH_CLOSE, kernel)
@@ -18,17 +18,17 @@ def segment_ocean_land(img, i):
     # Create an empty output image
     segmented = np.zeros_like(img)
     # Assign colors
-    segmented[ocean_mask > 0] = [255, 100, 100]   # Blue-tint (BGR) for ocean
-    segmented[land_mask > 0] = [100, 255, 100]   # Green-tint (BGR) for land
+    segmented[ocean_mask > 0] = [255, 100, 100]
+    segmented[land_mask > 0] = [50, 255, 255]
 
     # Prepare the output path
-    image_name = f"{i}.png"
+    image_name = f"{i}_output.png"
     os.makedirs('output_folder', exist_ok=True)
     output_path = os.path.join('./output_folder', image_name)
 
     # Save the result (segmented) image
     cv2.imwrite(output_path, segmented)
-    print(f"Segmented image saved to {output_path}")
+    # print(f"Segmented image saved to {output_path}")
 
 
 def detect_color(img, cntr, cntr_type):

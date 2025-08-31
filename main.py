@@ -9,12 +9,6 @@ import math
 shape_list = {'star': 3, 'triangle': 2, 'square': 1}
 color_list = {'red': 3, 'yellow': 2, 'green': 1}
 center_color_list = {'pink': 3, 'blue': 4, 'grey': 2}
-img_list = os.listdir('./uas images')
-
-for i in img_list:
-    print(int(i[:-4]))
-
-name = './uas images/2.png'
 
 
 def distance(p1, p2):
@@ -22,7 +16,7 @@ def distance(p1, p2):
 
 
 def calculate_priority(patient):
-    print(patient['color'])
+    # print(patient['color'])
     return shape_list[patient['shape']]*color_list[patient['color']]
 
 
@@ -98,7 +92,7 @@ def center_score_calc(center):
     return center_sum
 
 
-def main(path):
+def main(path, num):
     img = cv2.imread(path)
     obj_list = sd.detect_shape(img)
     patient_list = []
@@ -112,18 +106,37 @@ def main(path):
             centre_list.append(i)
 
     maximise_center_score(centre_list, patient_list)
-    print(distance_matrix(centre_list, patient_list))
+    print(
+        f"Image Number {num} Distance Matrix: \n {distance_matrix(centre_list, patient_list)}")
     center_patient_list = center_patient_list_gen(centre_list)
-    print(center_patient_list)
     center_score_list = []
     for i in center_patient_list:
         center_score_list.append(center_score_calc(i))
 
-    print(center_score_list)
-    cd.segment_ocean_land(img, 1)
+    print(f"Image Number {num} Centre Score List:{center_patient_list}")
+    cd.segment_ocean_land(img, num)
 
     final_image_score = sum(center_score_list) / len(patient_list)
-    print(final_image_score)
+    # print(final_image_score)
+    print(f"Image Number {num} Final Score :{final_image_score}")
+
+    return final_image_score, center_score_list
 
 
-main(name)
+img_list = os.listdir('./uas images')
+
+comb_score_list = {}
+comb_ratio_list = {}
+
+for i in img_list:
+    img_scr, ctr_scr = main(f"./uas images/{i}", int(i[:-4]))
+    comb_score_list[int(i[:-4])] = ctr_scr
+    comb_ratio_list[int(i[:-4])] = img_scr
+    print('\n')
+
+sorted_img_score = sorted(
+    comb_ratio_list, key=comb_ratio_list.get, reverse=True)
+print(
+    f"Final List of all center scores of different images:\n{comb_score_list}\n")
+print(
+    f"Image List Sorted according to best score(descending order):\n{sorted_img_score}")
