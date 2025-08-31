@@ -69,7 +69,7 @@ def distance_matrix(centers, patients):
     return np.array(matrix, dtype=np.float32)
 
 
-def center_casualty_list(centers):
+def center_patient_list_gen(centers):
     blue_center = []
     pink_center = []
     grey_center = []
@@ -89,6 +89,13 @@ def center_casualty_list(centers):
     return [blue_center, pink_center, grey_center]
 
 
+def center_score_calc(center):
+    center_sum = 0
+    for i in center:
+        center_sum += i[0]*i[1]
+    return center_sum
+
+
 def main(path):
     img = cv2.imread(path)
     obj_list = sd.detect_shape(img)
@@ -104,7 +111,16 @@ def main(path):
 
     maximise_center_score(centre_list, patient_list)
     print(distance_matrix(centre_list, patient_list))
-    print(center_casualty_list(centre_list))
+    center_patient_list = center_patient_list_gen(centre_list)
+    print(center_patient_list)
+    center_score_list = []
+    for i in center_patient_list:
+        center_score_list.append(center_score_calc(i))
+
+    print(center_score_list)
+
+    final_image_score = sum(center_score_list) / len(patient_list)
+    print(final_image_score)
 
 
 main(name)
